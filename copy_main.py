@@ -64,5 +64,17 @@ def restore_power(message):
         # Если покемон не создан, уведомляем пользователя
         bot.send_message(message.chat.id, "Сначала создайте покемона с помощью команды /go.")
 
+@bot.message_handler(commands=['info'])
+def info(message):
+    # Проверяем, есть ли у пользователя покемон
+    if message.from_user.username in Pokemon.pokemons.keys():
+        # Получаем покемона пользователя
+        pok = Pokemon.pokemons[message.from_user.username]
+        # Отправляем информацию о покемоне
+        bot.send_message(message.chat.id, pok.info())
+    else:
+        # Если покемона нет, уведомляем пользователя
+        bot.send_message(message.chat.id, "У вас нет покемона. Создайте его с помощью команды /go.")
+
 # Запускаем бота
 bot.infinity_polling(none_stop=True)
