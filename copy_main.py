@@ -76,5 +76,19 @@ def info(message):
         # Если покемона нет, уведомляем пользователя
         bot.send_message(message.chat.id, "У вас нет покемона. Создайте его с помощью команды /go.")
 
+@bot.message_handler(commands=['feed'])
+def feed_pokemon(message):
+    # Получаем имя пользователя
+    username = message.from_user.username
+    # Проверяем, существует ли покемон у пользователя
+    if username in Pokemon.pokemons:
+        pokemon = Pokemon.pokemons[username]
+        # Вызываем метод feed и получаем результат
+        result = pokemon.feed()
+        bot.send_message(message.chat.id, result)
+    else:
+        # Если покемон не создан, уведомляем пользователя
+        bot.send_message(message.chat.id, "Сначала создайте покемона с помощью команды /go.")
+
 # Запускаем бота
 bot.infinity_polling(none_stop=True)

@@ -9,6 +9,8 @@ class Pokemon:
         self.pokemon_trainer = pokemon_trainer   
 
         self.pokemon_number = randint(1,1000)
+        self.hp = randint(1,500)
+        self.power = randint(1,500)
         self.img = self.get_img()
         self.name = self.get_name()
         self.height = self.get_height()
@@ -18,6 +20,7 @@ class Pokemon:
 
         Pokemon.pokemons[pokemon_trainer] = self
 
+
     # Метод для получения картинки покемона через API
     def get_img(self):
         url = f'https://pokeapi.co/api/v2/pokemon/{self.pokemon_number}'
@@ -26,7 +29,7 @@ class Pokemon:
             data = response.json()
             return f'https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/home/{self.pokemon_number}.png'
         else:
-            return "Photo is not found"
+            return "Фото не найдено"
     
     # Метод для получения имени покемона через API
     def get_name(self):
@@ -71,14 +74,59 @@ class Pokemon:
                 abilities.append(f"{ability_name}" + (" (hidden)" if is_hidden else ""))
             return abilities
         return []
+    
+# Метод атаки покемона 
+    def attack(self, enemy):
+        if enemy.hp > self.power:
+            enemy.hp -= self.power
+            return f"Сражение @{self.pokemon_trainer} с @{enemy.pokemon_trainer}"
+        else:
+            enemy.hp = 0
+            return f"Победа @{self.pokemon_trainer} над @{enemy.pokemon_trainer}! "
 
     # Метод класса для получения информации
     def info(self):
-        return f"Имя твоего покеомона: {self.name}\nВысота: {self.height}\nШирина: {self.weight}\nСпособности: {self.abilities}"
+        return f"Имя твоего покеомона: {self.name}\nСила:{self.power}\nЗдоровье:{self.hp}\nВысота: {self.height}\nШирина: {self.weight}\nСпособности: {self.abilities}"
 
     # Метод класса для получения картинки покемона
     def show_img(self):
         return self.img
 
 
+class Wizard(Pokemon):
+    #Увеличение здоровья
+    def __init__(self, name, power, hp, height, weight, abilities, img, pokemon_trainer, pokemon_number):
+        self.hp += 300
+
+# Метод атаки мага
+    def attack(self, enemy):
+        # Проверка врага
+        if isinstance(enemy, Wizard):
+            chance = randint(1, 5)
+            if chance == 1:
+                return f"{self.name} применил щит в сражении и уклонился от атаки!"
+        return super().attack(enemy)
+    
+    def info(self):
+        info_pok = super().info
+        return f'{info_pok}\nУ тебя Маг(здоровье увеличино на 300)\nТеперь здоровье: {self.hp}'
+    
+
+class Fighter(Pokemon):
+    #Увеличение силы
+    def __init__(self, name, power, hp, height, weight, abilities, img, pokemon_trainer, pokemon_number):
+        self.power += 200
+
+#Метод атаки бойца
+    def attack(self, enemy):
+        super_boost = randint(5, 15) 
+        self.power += super_boost
+        result = super().attack(enemy)
+        self.power -= super_boost  # Восстанавливаем силу
+        return result + f"\nБоец применил супер-атаку силой: {super_boost}."
+    
+    def info(self):
+        info_pok = super().info()
+        return  f'{info_pok}\nУ тебя Боец(сила увеличина на 200)\nТеперь сила: {self.power}'
+    
 

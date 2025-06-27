@@ -1,4 +1,5 @@
 from random import randint
+from datetime import datetime, timedelta
 import requests
 
 class Pokemon:
@@ -15,6 +16,7 @@ class Pokemon:
         self.weight = self.get_weight()
         self.abilities = self.get_abilities()
         self.is_alive = True
+        self.last_feed_time = datetime.now()  # Инициализация времени последнего кормления
 
         Pokemon.pokemons[pokemon_trainer] = self
 
@@ -62,6 +64,17 @@ class Pokemon:
             return abilities
         return []
 
+    def feed(self, feed_interval=20, hp_increase=10):
+        current_time = datetime.now()  
+        delta_time = timedelta(seconds=feed_interval)  
+        if (current_time - self.last_feed_time) > delta_time:
+            self.hp += hp_increase
+            self.last_feed_time = current_time
+            return f"Здоровье покемона увеличено. Текущее здоровье: {self.hp}"
+        else:
+            next_feed_time = self.last_feed_time + delta_time
+            return f"Следующее время кормления покемона: {next_feed_time}"
+
     def attack(self, enemy):
         if enemy.hp <= 0:
             return f"Противник @{enemy.pokemon_trainer} уже повержен."
@@ -97,6 +110,9 @@ class Wizard(Pokemon):
         self.hp += 300
         self.super_shield_used = False
 
+    def feed(self):
+        return super().feed(feed_interval=15, hp_increase=5)  # Уменьшенный интервал и меньшее увеличение здоровья
+
     def attack(self, enemy):
         if not self.super_shield_used and isinstance(enemy, Wizard):
             if randint(1, 5) == 1:
@@ -123,6 +139,9 @@ class Fighter(Pokemon):
         super().__init__(pokemon_trainer)
         self.power += 200
         self.super_strike_used = False
+
+    def feed(self):
+        return super().feed(feed_interval=20, hp_increase=20)  # Стандартный интервал и большее увеличение здоровья
 
     def attack(self, enemy):
         if not self.super_strike_used and not enemy.is_alive:
@@ -170,3 +189,7 @@ if __name__ == "__main__":
     print(wizard.info())
     print(fighter.info())
 
+    # Проверка метода кормления
+    print("\nПроверка кормления:")
+    print(wizard.feed())  # Проверка кормления мага
+    print(fighter.feed())  # Проверка кормления бойца
